@@ -3,117 +3,109 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Flood Alert — Trivandrum</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <title>Flood Alert — Trivandrum (GitHub DB)</title>
   <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 </head>
 <body>
-  <div id="alertBanner" class="hidden"></div>
+  <div id="alert" class="hidden"></div>
 
   <div id="leftPanel">
-    <h3>Flood Alert — Trivandrum</h3>
+    <h2>Flood Alert — Trivandrum</h2>
 
-    <label class="small">Start (type or "Current location")</label>
+    <label>Start</label>
     <div class="row">
-      <input id="startInput" class="input" placeholder="Start (e.g. Current location or search)"/>
-      <button id="useCurrentBtn" class="smallBtn">Current</button>
+      <input id="startInput" class="input" placeholder="Type a place or 'Current'">
+      <button id="useCurrent" class="smallBtn">Current</button>
     </div>
     <div id="startSuggest" class="suggestions hidden"></div>
 
-    <label class="small">Destination (Trivandrum)</label>
-    <input id="endInput" class="input" placeholder="Destination (search)"/>
+    <label>Destination</label>
+    <input id="endInput" class="input" placeholder="Type destination (Trivandrum)">
     <div id="endSuggest" class="suggestions hidden"></div>
 
-    <div class="row">
+    <div class="row" style="margin-top:8px">
       <button id="findBtn" class="btn primary">Find fast & safe route</button>
-      <button id="takeSafeBtn" class="btn safe hidden">Take Safe Route</button>
+      <button id="takeSafe" class="btn safe hidden">Take Safe Route</button>
     </div>
 
-    <div id="routeInfo" class="small muted"></div>
+    <div id="routeInfo" class="muted"></div>
 
     <div class="row" style="margin-top:10px">
       <button id="reportBtn" class="smallBtn danger">Report Flood Road</button>
-      <button id="openSettingsBtn" class="smallBtn">Settings</button>
+      <button id="settingsBtn" class="smallBtn">Settings</button>
     </div>
   </div>
 
-  <div id="topControls">
-    <div id="weatherBadge" class="small muted hidden"></div>
-  </div>
-
-  <div id="legend" class="small muted">
+  <div id="legend">
     <div><strong>Legend</strong></div>
-    <div class="legend-row"><span class="swatch danger"></span> Flooded road</div>
-    <div class="legend-row"><span class="swatch safe"></span> Safe route</div>
+    <div class="legend-row"><div class="swatch danger"></div>Flooded road</div>
+    <div class="legend-row"><div class="swatch safe"></div>Safe route (light blue)</div>
   </div>
 
   <div id="map"></div>
 
-  <button id="mapFinishBtn" class="map-finish hidden">Finish Report</button>
+  <button id="finishReportBtn" class="map-finish hidden">Finish Report</button>
 
   <!-- Report modal -->
   <div id="reportModal" class="modal hidden">
     <div class="panel">
       <h3>Report Flooded Road</h3>
-      <p class="small">Click <b>Pick on Map</b>, then click START and END on the map (two clicks). After second click you'll see <b>Finish Report</b> button on map. Or paste coords: <code>lat1,lng1;lat2,lng2</code>.</p>
-      <input id="reportInput" class="input" placeholder="Optional: lat1,lng1;lat2,lng2"/>
-      <div class="row">
-        <button id="pickRoadBtn" class="smallBtn">Pick on Map</button>
+      <p class="muted">Click <b>Pick on Map</b>, then click START then END on the map. Or paste coords like:<br><code>8.52,76.94;8.521,76.941</code></p>
+      <input id="reportCoords" class="input" placeholder="Optional coords (lat,lng;lat,lng)">
+      <div class="row" style="margin-top:8px">
+        <button id="pickOnMapBtn" class="smallBtn">Pick on Map</button>
         <button id="closeReportBtn" class="smallBtn danger">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- Settings modal (includes admin) -->
+  <!-- Settings/Admin -->
   <div id="settingsModal" class="modal hidden">
     <div class="panel">
       <h3>Settings & Admin</h3>
-
-      <div class="row" style="margin-bottom:8px">
-        <button id="toggleThemeBtn" class="smallBtn">Toggle Light/Dark</button>
-        <button id="resetViewBtn" class="smallBtn">Reset View</button>
+      <div class="row">
+        <button id="themeToggle" class="smallBtn">Toggle Light/Dark</button>
+        <button id="resetView" class="smallBtn">Reset View</button>
       </div>
 
       <hr/>
 
       <h4>Admin Login</h4>
-      <input id="adminUser" class="input" placeholder="Admin id (default: admin)"/>
-      <input id="adminPass" type="password" class="input" placeholder="Password"/>
-      <div class="row">
-        <button id="adminLoginBtn" class="smallBtn primary">Login</button>
-        <button id="adminChangePassBtn" class="smallBtn">Change Password</button>
-        <button id="closeSettingsBtn" class="smallBtn danger">Close</button>
+      <input id="adminUser" class="input" placeholder="admin">
+      <input id="adminPass" class="input" placeholder="password" type="password">
+      <div class="row" style="margin-top:8px">
+        <button id="adminLogin" class="smallBtn primary">Login</button>
+        <button id="changePass" class="smallBtn">Change Password</button>
+        <button id="closeSettings" class="smallBtn danger">Close</button>
       </div>
 
-      <div id="adminTools" class="hidden" style="margin-top:12px">
+      <div id="adminArea" class="hidden" style="margin-top:12px">
         <h4>Pending Reports</h4>
-        <div id="reportsList" class="list"></div>
+        <div id="pendingList" style="max-height:160px;overflow:auto"></div>
 
         <hr/>
-        <h4>Draw Flooded Road (Admin)</h4>
-        <p class="small">Start Draw → click map → Finish & Save</p>
-        <div class="row">
-          <button id="startDrawBtn" class="smallBtn">Start Draw</button>
-          <button id="finishDrawBtn" class="smallBtn primary">Finish & Save</button>
-          <button id="cancelDrawBtn" class="smallBtn danger">Cancel</button>
+        <h4>Flood Roads (approved)</h4>
+        <div id="approvedList" style="max-height:160px;overflow:auto"></div>
+
+        <hr/>
+        <h4>GitHub Config (for testing)</h4>
+        <p class="muted">Set your repo info & token below (only for testing). Keep token secret!</p>
+        <input id="ghOwner" class="input" placeholder="GitHub username/org">
+        <input id="ghRepo" class="input" placeholder="Repo name">
+        <input id="ghPath" class="input" value="data/flood_data.json" placeholder="file path (data/flood_data.json)">
+        <input id="ghToken" class="input" placeholder="GH token (temporary)">
+        <div class="row" style="margin-top:8px">
+          <button id="saveGhBtn" class="smallBtn">Save GitHub config</button>
+          <button id="forceReload" class="smallBtn">Reload floods</button>
         </div>
-
-        <hr/>
-        <h4>Export / Import</h4>
-        <div class="row">
-          <button id="exportBtn" class="smallBtn">Export</button>
-          <button id="importBtn" class="smallBtn">Import</button>
-        </div>
-        <textarea id="importArea" class="input" placeholder='Paste JSON here to import'></textarea>
-
-        <hr/>
-        <h4>Saved Flooded Roads</h4>
-        <div id="roadsList" class="list"></div>
       </div>
+
     </div>
   </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.polylinedecorator/1.7.0/leaflet.polylineDecorator.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
