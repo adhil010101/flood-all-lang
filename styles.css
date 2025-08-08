@@ -1,0 +1,64 @@
+:root{
+  --bg:#0f1720; --panel:#0b1220; --text:#e6eef6; --muted:#9fb0c8;
+  --accent:#16a34a; --danger:#ef4444; --safe:#28c76f;
+  --panel-contrast:#071025;
+}
+body.light{ --bg:#f6fbff; --panel:#fff; --text:#0b1220; --muted:#475569 }
+*{box-sizing:border-box}
+html,body,#map{height:100%;margin:0;padding:0}
+body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+
+/* left panel */
+#leftPanel{
+  position:absolute; left:12px; top:12px; z-index:1400; width:360px;
+  background:var(--panel); padding:12px; border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.45);
+}
+#leftPanel h3{ margin:0 0 8px 0; font-size:16px }
+.input{ width:100%; padding:10px; margin-bottom:8px; border-radius:8px; border:0; background:var(--panel-contrast); color:var(--text) }
+.btn{ padding:10px; border-radius:8px; border:0; cursor:pointer }
+.primary{ background:linear-gradient(90deg,#10b981,#064e3b); color:white; font-weight:700 }
+.safe{ background:var(--safe); color:#04311a; font-weight:700 }
+.smallBtn{ padding:8px 10px; border-radius:8px; border:0; background:var(--panel-contrast); color:var(--text); cursor:pointer }
+.danger{ background:var(--danger); color:white }
+
+/* suggestions */
+.suggestions{ position:absolute; z-index:2100; background:var(--panel); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.45); overflow:auto; max-height:220px; color:var(--text) }
+.suggestions div{ padding:8px; border-bottom:1px solid rgba(255,255,255,0.03); cursor:pointer }
+.suggestions div:hover{ background: rgba(255,255,255,0.02) }
+
+/* top controls */
+#topControls{ position:absolute; right:12px; top:12px; z-index:1500; display:flex; flex-direction:column; gap:8px; align-items:flex-end }
+#weatherBadge{ background:var(--panel); padding:8px; border-radius:8px; color:var(--muted) }
+
+/* legend */
+#legend{ position:absolute; left:12px; bottom:12px; z-index:1200; background:var(--panel); padding:10px; border-radius:10px; color:var(--muted); font-size:13px }
+.legend-row{ display:flex; gap:8px; align-items:center; margin-top:6px }
+.swatch{ width:18px; height:10px; border-radius:3px }
+.swatch.danger{ background:var(--danger) }
+.swatch.safe{ background:var(--safe) }
+
+/* alert banner */
+#alertBanner{ position:absolute; left:50%; transform:translateX(-50%); top:12px; z-index:1600; min-width:320px; padding:12px; border-radius:10px; display:block; font-weight:700; color:white; cursor:pointer; box-shadow:0 12px 40px rgba(0,0,0,0.4) }
+.hidden{ display:none !important }
+
+/* modal */
+.modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:1700; background:rgba(0,0,0,0.45) }
+.panel{ width:560px; max-height:82vh; overflow:auto; background:var(--panel); padding:14px; border-radius:12px; color:var(--text) }
+.list{ max-height:180px; overflow:auto; border:1px solid rgba(255,255,255,0.02); padding:6px; border-radius:6px }
+
+/* map finish button */
+.map-finish{
+  position:absolute; left:50%; transform:translateX(-50%); bottom:96px; z-index:2000; padding:10px 14px; border-radius:10px; background:var(--accent); color:#04311a; font-weight:700; cursor:pointer; box-shadow:0 12px 30px rgba(2,6,23,0.6)
+}
+
+/* small helpers */
+.row{ display:flex; gap:8px; align-items:center }
+.muted{ color:var(--muted) }
+.small{ font-size:12px }
+
+/* responsive */
+@media (max-width:720px){
+  #leftPanel{ width:92%; left:4% }
+  .panel{ width:92% }
+}
