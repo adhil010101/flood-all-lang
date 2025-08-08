@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Flood Alert — Trivandrum</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div id="alertBanner" class="hidden"></div>
+
+  <div id="leftPanel">
+    <h3>Flood Alert — Trivandrum</h3>
+
+    <label class="small">Start (type or "Current location")</label>
+    <div class="row">
+      <input id="startInput" class="input" placeholder="Start (e.g. Current location or search)"/>
+      <button id="useCurrentBtn" class="smallBtn">Current</button>
+    </div>
+    <div id="startSuggest" class="suggestions hidden"></div>
+
+    <label class="small">Destination (Trivandrum)</label>
+    <input id="endInput" class="input" placeholder="Destination (search)"/>
+    <div id="endSuggest" class="suggestions hidden"></div>
+
+    <div class="row">
+      <button id="findBtn" class="btn primary">Find fast & safe route</button>
+      <button id="takeSafeBtn" class="btn safe hidden">Take Safe Route</button>
+    </div>
+
+    <div id="routeInfo" class="small muted"></div>
+
+    <div class="row" style="margin-top:10px">
+      <button id="reportBtn" class="smallBtn danger">Report Flood Road</button>
+      <button id="openSettingsBtn" class="smallBtn">Settings</button>
+    </div>
+  </div>
+
+  <div id="topControls">
+    <div id="weatherBadge" class="small muted hidden"></div>
+  </div>
+
+  <div id="legend" class="small muted">
+    <div><strong>Legend</strong></div>
+    <div class="legend-row"><span class="swatch danger"></span> Flooded road</div>
+    <div class="legend-row"><span class="swatch safe"></span> Safe route</div>
+  </div>
+
+  <div id="map"></div>
+
+  <button id="mapFinishBtn" class="map-finish hidden">Finish Report</button>
+
+  <!-- Report modal -->
+  <div id="reportModal" class="modal hidden">
+    <div class="panel">
+      <h3>Report Flooded Road</h3>
+      <p class="small">Click <b>Pick on Map</b>, then click START and END on the map (two clicks). After second click you'll see <b>Finish Report</b> button on map. Or paste coords: <code>lat1,lng1;lat2,lng2</code>.</p>
+      <input id="reportInput" class="input" placeholder="Optional: lat1,lng1;lat2,lng2"/>
+      <div class="row">
+        <button id="pickRoadBtn" class="smallBtn">Pick on Map</button>
+        <button id="closeReportBtn" class="smallBtn danger">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal (includes admin) -->
+  <div id="settingsModal" class="modal hidden">
+    <div class="panel">
+      <h3>Settings & Admin</h3>
+
+      <div class="row" style="margin-bottom:8px">
+        <button id="toggleThemeBtn" class="smallBtn">Toggle Light/Dark</button>
+        <button id="resetViewBtn" class="smallBtn">Reset View</button>
+      </div>
+
+      <hr/>
+
+      <h4>Admin Login</h4>
+      <input id="adminUser" class="input" placeholder="Admin id (default: admin)"/>
+      <input id="adminPass" type="password" class="input" placeholder="Password"/>
+      <div class="row">
+        <button id="adminLoginBtn" class="smallBtn primary">Login</button>
+        <button id="adminChangePassBtn" class="smallBtn">Change Password</button>
+        <button id="closeSettingsBtn" class="smallBtn danger">Close</button>
+      </div>
+
+      <div id="adminTools" class="hidden" style="margin-top:12px">
+        <h4>Pending Reports</h4>
+        <div id="reportsList" class="list"></div>
+
+        <hr/>
+        <h4>Draw Flooded Road (Admin)</h4>
+        <p class="small">Start Draw → click map → Finish & Save</p>
+        <div class="row">
+          <button id="startDrawBtn" class="smallBtn">Start Draw</button>
+          <button id="finishDrawBtn" class="smallBtn primary">Finish & Save</button>
+          <button id="cancelDrawBtn" class="smallBtn danger">Cancel</button>
+        </div>
+
+        <hr/>
+        <h4>Export / Import</h4>
+        <div class="row">
+          <button id="exportBtn" class="smallBtn">Export</button>
+          <button id="importBtn" class="smallBtn">Import</button>
+        </div>
+        <textarea id="importArea" class="input" placeholder='Paste JSON here to import'></textarea>
+
+        <hr/>
+        <h4>Saved Flooded Roads</h4>
+        <div id="roadsList" class="list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
