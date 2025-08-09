@@ -1,112 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Flood Alert — Trivandrum</title>
-
-  <link rel="stylesheet" href="styles.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flood Alert & Navigation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
+    <header>
+        <h1>🌊 Flood Alert & Navigation</h1>
+        <button id="adminLoginBtn">Admin Panel</button>
+    </header>
 
-  <div id="alertBanner" class="hidden"></div>
+    <div id="map"></div>
 
-  <div id="leftPanel">
-    <h3>Flood Alert — Trivandrum</h3>
-
-    <label class="small">Start (type or "Current")</label>
-    <div style="display:flex;gap:8px">
-      <input id="startInput" class="input" placeholder="Type start place or 'Current location'">
-      <button id="useCurrent" class="smallBtn">Current</button>
-    </div>
-    <div id="startSuggest" class="suggestions hidden"></div>
-
-    <label class="small">Destination (Trivandrum)</label>
-    <input id="endInput" class="input" placeholder="Type destination (Trivandrum)">
-    <div id="endSuggest" class="suggestions hidden"></div>
-
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button id="findBtn" class="btn primary">Find fast & safe route</button>
-      <button id="takeSafeBtn" class="btn safe" style="display:none">Take Safe Route</button>
+    <div class="controls">
+        <button id="pickLocationBtn">📍 Pick from Map</button>
+        <button id="simulateFloodsBtn">💧 Simulate Floods</button>
     </div>
 
-    <div id="routeInfo" class="small muted" style="margin-top:8px"></div>
-
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button id="reportBtn" class="smallBtn danger">Report Flood Road</button>
-      <button id="settingsBtn" class="smallBtn">Settings</button>
-    </div>
-  </div>
-
-  <div id="legend">
-    <div><strong>Legend</strong></div>
-    <div class="legend-row"><div class="swatch danger"></div><div class="small">Flooded road</div></div>
-    <div class="legend-row"><div class="swatch safe"></div><div class="small">Safe route (light blue)</div></div>
-  </div>
-
-  <div id="map"></div>
-
-  <!-- Report modal -->
-  <div id="reportModal" class="modal hidden">
-    <div class="panel">
-      <h3>Report Flooded Road</h3>
-      <p class="small muted">Click <b>Pick on Map</b>, then click START then END on the map (two clicks). Or paste coords like: <code>8.52,76.94;8.521,76.941</code></p>
-      <input id="reportCoords" class="input" placeholder="Optional coords (lat,lng;lat,lng)">
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="pickOnMapBtn" class="smallBtn">Pick on Map</button>
-        <button id="submitReportBtn" class="smallBtn" style="background:var(--accent)">Submit</button>
-        <button id="closeReportBtn" class="smallBtn danger">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings/Admin -->
-  <div id="settingsModal" class="modal hidden">
-    <div class="panel">
-      <h3>Settings & Admin</h3>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <button id="toggleTheme" class="smallBtn">Toggle Light/Dark</button>
-        <button id="resetView" class="smallBtn">Reset View</button>
-      </div>
-
-      <hr/>
-
-      <h4>Admin Login</h4>
-      <input id="adminUser" class="input" placeholder="admin">
-      <input id="adminPass" class="input" placeholder="password" type="password">
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="adminLogin" class="smallBtn primary">Login</button>
-        <button id="changePass" class="smallBtn">Change Password</button>
-        <button id="closeSettings" class="smallBtn danger">Close</button>
-      </div>
-
-      <div id="adminArea" style="display:none;margin-top:12px">
-        <h4>Pending Reports</h4>
-        <div id="pendingList" style="max-height:160px;overflow:auto"></div>
-
-        <hr/>
-        <h4>Flood Roads (approved)</h4>
-        <div id="approvedList" style="max-height:160px;overflow:auto"></div>
-
-        <hr/>
-        <h4>GitHub Config (optional)</h4>
-        <input id="ghOwner" class="input" placeholder="GitHub username/org">
-        <input id="ghRepo" class="input" placeholder="Repo name">
-        <input id="ghPath" class="input" value="data/flood_data.json" placeholder="file path (data/flood_data.json)">
-        <input id="ghToken" class="input" placeholder="GH token (temporary)">
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="saveGhBtn" class="smallBtn">Save GH config</button>
-          <button id="forceReload" class="smallBtn">Reload floods</button>
+    <!-- Flood report modal -->
+    <div id="floodModal" class="modal">
+        <div class="modal-content">
+            <h2>Report Flood</h2>
+            <p>Selected Location: <span id="selectedCoords"></span></p>
+            <button id="donePickBtn">Done Pick</button>
+            <button id="closeModalBtn">Close</button>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- libs + app -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.polylinedecorator/1.7.0/leaflet.polylineDecorator.min.js"></script>
-  <script src="app.js"></script>
+    <!-- Submit button popup -->
+    <div id="submitPopup" class="popup">
+        <button id="submitFloodBtn" class="glow-btn">Submit Flood Report</button>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="modal">
+        <div class="modal-content">
+            <h2>Admin Panel</h2>
+            <div id="pendingReports"></div>
+            <button id="closeAdminBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Weather Info -->
+    <div id="weatherInfo"></div>
+
+    <script src="script.js"></script>
 </body>
 </html>
