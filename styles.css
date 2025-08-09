@@ -1,6 +1,6 @@
 :root{
   --bg:#0f1720; --panel:#0b1220; --text:#e6eef6; --muted:#9fb0c8;
-  --accent:#16a34a; --danger:#ef4444; --safe:#28c76f;
+  --accent:#16a34a; --danger:#ef4444; --safe:#60A5FA; /* light blue safe route */
   --panel-contrast:#071025;
 }
 body.light{ --bg:#f6fbff; --panel:#fff; --text:#0b1220; --muted:#475569 }
@@ -27,10 +27,6 @@ body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);
 .suggestions div{ padding:8px; border-bottom:1px solid rgba(255,255,255,0.03); cursor:pointer }
 .suggestions div:hover{ background: rgba(255,255,255,0.02) }
 
-/* top controls */
-#topControls{ position:absolute; right:12px; top:12px; z-index:1500; display:flex; flex-direction:column; gap:8px; align-items:flex-end }
-#weatherBadge{ background:var(--panel); padding:8px; border-radius:8px; color:var(--muted) }
-
 /* legend */
 #legend{ position:absolute; left:12px; bottom:12px; z-index:1200; background:var(--panel); padding:10px; border-radius:10px; color:var(--muted); font-size:13px }
 .legend-row{ display:flex; gap:8px; align-items:center; margin-top:6px }
@@ -39,18 +35,24 @@ body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);
 .swatch.safe{ background:var(--safe) }
 
 /* alert banner */
-#alertBanner{ position:absolute; left:50%; transform:translateX(-50%); top:12px; z-index:1600; min-width:320px; padding:12px; border-radius:10px; display:block; font-weight:700; color:white; cursor:pointer; box-shadow:0 12px 40px rgba(0,0,0,0.4) }
-.hidden{ display:none !important }
+#alertBanner{ position:absolute; left:50%; transform:translateX(-50%); top:12px; z-index:1600; min-width:320px; padding:12px; border-radius:10px; display:none; font-weight:700; color:white; cursor:pointer; box-shadow:0 12px 40px rgba(0,0,0,0.4) }
 
 /* modal */
 .modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:1700; background:rgba(0,0,0,0.45) }
 .panel{ width:560px; max-height:82vh; overflow:auto; background:var(--panel); padding:14px; border-radius:12px; color:var(--text) }
-.list{ max-height:180px; overflow:auto; border:1px solid rgba(255,255,255,0.02); padding:6px; border-radius:6px }
 
-/* map finish button */
-.map-finish{
-  position:absolute; left:50%; transform:translateX(-50%); bottom:96px; z-index:2000; padding:10px 14px; border-radius:10px; background:var(--accent); color:#04311a; font-weight:700; cursor:pointer; box-shadow:0 12px 30px rgba(2,6,23,0.6)
+/* current location icon styles */
+.leaflet-current-icon {
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  transform:translate(-50%,-50%);
 }
+.leaflet-current-icon svg { filter: drop-shadow(0 2px 6px rgba(6,182,212,0.45)); }
+
+.pulse-ring {
+  animation: pulse 2s infinite;
+  border-radius:50%;
+}
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(96,165,250,0.6); } 70% { box-shadow: 0 0 0 16px rgba(96,165,250,0.05);} 100% { box-shadow:0 0 0 0 rgba(96,165,250,0);} }
 
 /* small helpers */
 .row{ display:flex; gap:8px; align-items:center }
@@ -62,3 +64,4 @@ body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);
   #leftPanel{ width:92%; left:4% }
   .panel{ width:92% }
 }
+.hidden{ display:none !important }
