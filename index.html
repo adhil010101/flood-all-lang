@@ -1,53 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Flood Alert System</title>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flood Alert & Navigation</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 90vh;
+            width: 100%;
+        }
+        #controls {
+            padding: 10px;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: space-around;
+        }
+        button {
+            padding: 8px 12px;
+            cursor: pointer;
+            border: none;
+            background: #007BFF;
+            color: white;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #adminPanel {
+            display: none;
+            padding: 10px;
+            background: #f9f9f9;
+            border-top: 1px solid #ccc;
+        }
+        .flood-marker {
+            background: red;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>🌊 Flood Alert & Navigation</h1>
-        <button id="adminLoginBtn">Admin Panel</button>
-    </header>
 
-    <div id="map"></div>
+<div id="controls">
+    <button onclick="startPickFlood()">Report Flood</button>
+    <button onclick="showAdminLogin()">Admin</button>
+    <span id="weather">Loading weather...</span>
+</div>
 
-    <div class="controls">
-        <button id="pickLocationBtn">📍 Pick from Map</button>
-        <button id="simulateFloodsBtn">💧 Simulate Floods</button>
-    </div>
+<div id="map"></div>
 
-    <!-- Flood report modal -->
-    <div id="floodModal" class="modal">
-        <div class="modal-content">
-            <h2>Report Flood</h2>
-            <p>Selected Location: <span id="selectedCoords"></span></p>
-            <button id="donePickBtn">Done Pick</button>
-            <button id="closeModalBtn">Close</button>
-        </div>
-    </div>
+<div id="adminPanel">
+    <h3>Admin Approval</h3>
+    <div id="pendingReports"></div>
+</div>
 
-    <!-- Submit button popup -->
-    <div id="submitPopup" class="popup">
-        <button id="submitFloodBtn" class="glow-btn">Submit Flood Report</button>
-    </div>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    <!-- Admin Panel -->
-    <div id="adminPanel" class="modal">
-        <div class="modal-content">
-            <h2>Admin Panel</h2>
-            <div id="pendingReports"></div>
-            <button id="closeAdminBtn">Close</button>
-        </div>
-    </div>
+<script>
+    let map = L.map('map').setView([8.5241, 76.9366], 13); // Default Trivandrum
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
 
-    <!-- Weather Info -->
-    <div id="weatherInfo"></div>
+    // Load user location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+            L.marker([pos.coords.latitude, pos.coords.longitude]).addTo(map)
+                .bindPopup("You are here").openPopup();
+        });
+    }
 
-    <script src="script.js"></script>
+    // Load floods
+    let floods = JSON.parse(localStorage.getItem("floods")) || [];
+    floods.forEach(f => {
+        if (f.approved) {
+            L.circleMarker([f.lat, f.lng], {radius: 6, color: "red"}).addTo(map)
+                .bindPopup("Flood Reported");
+        }
+    });
+
+    // Flood picking
+    let picking = false;
+    function startPickFlood() {
+        picking = true;
+        alert("Click on the map to report flood location");
+    }
+    map.on("click", e => {
+        if (picking) {
+            let report = {lat: e.latlng.lat, lng: e.latlng.lng, approved: false};
+            let reports = JSON.parse(localStorage.getItem("floods")) || [];
+            reports.push(report);
+            localStorage.setItem("floods", JSON.stringify(reports));
+            alert("Flood report submitted for approval");
+            picking = false;
+        }
+    });
+
+    // Admin login
+    function showAdminLogin() {
+        let user = prompt("Enter admin username:");
+        let pass = prompt("Enter admin password:");
+        if (user === "helix" && pass === "helix") {
+            document.getElementById("adminPanel").style.display = "block";
+            loadPending();
+        } else {
+            alert("Invalid credentials");
+        }
+    }
+
+    // Load pending reports
+    function loadPending() {
+        let pendingDiv = document.getElementById("pendingReports");
+        pendingDiv.innerHTML = "";
+        let reports = JSON.parse(localStorage.getItem("floods")) || [];
+        reports.forEach((r, i) => {
+            if (!r.approved) {
+                let btn = `<button onclick="approveReport(${i})">Approve</button>`;
+                pendingDiv.innerHTML += `Report at (${r.lat.toFixed(4)}, ${r.lng.toFixed(4)}) ${btn}<br>`;
+            }
+        });
+    }
+
+    // Approve flood
+    function approveReport(index) {
+        let reports = JSON.parse(localStorage.getItem("floods")) || [];
+        reports[index].approved = true;
+        localStorage.setItem("floods", JSON.stringify(reports));
+        location.reload();
+    }
+
+    // Weather API (OpenWeatherMap demo)
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=8.5241&longitude=76.9366&current_weather=true")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("weather").innerText =
+                `Weather: ${data.current_weather.temperature}°C, Windspeed: ${data.current_weather.windspeed} km/h`;
+        });
+</script>
+
 </body>
 </html>
